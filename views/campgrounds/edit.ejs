@@ -1,0 +1,30 @@
+<%layout('./layouts/boilerplate')%>
+    <h1>Update Campground</h1>
+    <div>
+        <%camp.forEach((c)=>{%>
+        
+        <form action="/campgrounds/<%=c._id%>?_method=PUT" method="post">
+           
+            <div>
+                <label for="title">
+                    Title:
+                </label>
+                <input type="text" name="title" id="title" value="<%=c.title%>">
+            </div>
+            <div>
+                <label for="location">
+                    Location:
+                </label>
+                <input type="text" name="location" id="location" value="<%=c.location%>">   
+            </div>
+            <div>
+                <button type="submit">Save Edits</button>
+               <a href="/campground/<%=c._id%>">
+                <button>Go back</button>
+               </a> 
+                
+            </div>
+           
+        </form>
+        <%});%>
+    </div>

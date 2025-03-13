@@ -1,0 +1,12 @@
+<%layout('./layouts/boilerplate')%>
+    <%camp.forEach((c)=>{%>
+    <h1><%=c.title%></h1>
+    <h3>Location: <%=c.location%></h3>
+    <a href="/campgrounds/<%=c._id%>/edit"><button>Edit</button></a>
+   
+    <a href="/campgrounds"><button>View All Camps</button></a>
+    <br>
+    <form action="/campgrounds/<%=c._id%>?_method=DELETE" method="post">
+        <button type="submit">Delete camp</button>
+    </form>
+    <%})%>

@@ -1,0 +1,14 @@
+<%layout('./layouts/boilerplate')%>
+    <div>
+        <h1>All Campgrounds: </h1>
+    </div>
+    <div>
+        <% campgrounds.forEach((camp)=>{  %>
+            <ul>
+                <li><%=camp.title%>
+                <a href="/campgrounds/<%=camp._id%>">details</a>
+                </li>
+            </ul>
+
+        <%})%>
+    </div>
