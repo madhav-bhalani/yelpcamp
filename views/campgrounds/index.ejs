@@ -1,14 +1,25 @@
 <%layout('./layouts/boilerplate')%>
-    <div>
-        <h1>All Campgrounds: </h1>
+<div>
+  <h1>All Campgrounds:</h1>
+</div>
+<div>
+  <% campgrounds.forEach((camp)=>{ %>
+  <div class="card mb-3">
+    <div class="row">
+      <div class="col-md-4">
+        <img src="<%=camp.image%>" alt="" class="img-fluid" />
+      </div>
+      <div class="col-md-8">
+        <h5 class="card-title"><%=camp.title%></h5>
+        <p class="card-text"><%=camp.description%>>/p></p>
+        <p class="card-text">
+          <small class="text-muted"><%=camp.location%></small>
+        </p>
+        <a href="/campgrounds/<%=camp._id%>" class="btn btn-primary"
+          >View <%=camp.title%></a
+        >
+      </div>
     </div>
-    <div>
-        <% campgrounds.forEach((camp)=>{  %>
-            <ul>
-                <li><%=camp.title%>
-                <a href="/campgrounds/<%=camp._id%>">details</a>
-                </li>
-            </ul>
-
-        <%})%>
-    </div>
+  </div>
+  <%})%>
+</div>
