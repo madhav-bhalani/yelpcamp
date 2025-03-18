@@ -4,35 +4,35 @@
   <div class="col-6 offset-3">
     <form action="/campgrounds" class="needs-validation" method="post" novalidate>
       <div class="mb-3">
-        <label class="form-label" for="title"> Title: </label>
-        <input class="form-control" type="text" name="title" id="title" required />
+        <label class="form-label" for="campground[title]"> Title: </label>
+        <input class="form-control" type="text" name="campground[title]" id="title" required />
         
       </div>
       <div class="mb-3">
-        <label class="form-label" for="location"> Location: </label>
-        <input class="form-control" type="text" name="location" id="location" required/>
+        <label class="form-label" for="campground[location]"> Location: </label>
+        <input class="form-control" type="text" name="campground[location]" id="location" required/>
       </div>
       <div class="mb-3">
-        <label class="form-label" for="image"> Image Url: </label>
-        <input class="form-control" type="text" name="image" id="image" required/>
+        <label class="form-label" for="campground[image]"> Image Url: </label>
+        <input class="form-control" type="text" name="campground[image]" id="image" required/>
       </div>
       <div class="mb-3">
-        <label class="form-label" for="description"> Description: </label>
+        <label class="form-label" for="campground[description]"> Description: </label>
         <textarea
           class="form-control"
           type="text"
-          name="description"
+          name="campground[description]"
           id="description"
           required
         ></textarea>
       </div>
       <div class="mb-3">
-        <label class="form-label" for="price"> Campground Price: </label>
+        <label class="form-label" for="campground[price]"> Campground Price: </label>
         <div class="input-group mb-3">
           <span class="input-group-text" id="price-label">$</span>
           <input
             type="text"
-            name="price"
+            name="campground[price]"
             class="form-control"
             id="price"
             placeholder="0"

@@ -11,6 +11,7 @@ const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError');
 const campground = require("./models/campground");
 const { ObjectId } = require('mongoose').Types;
+const {campSchema} = require('./schemas');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
@@ -29,16 +30,7 @@ mongoose
   });
 
 const validateCampground = (req,res,next)=>{
-  const campSchema = Joi.object({
-    campground: Joi.object({
-      title: Joi.string().required(),
-      price: Joi.number().required().min(0),
-      image: Joi.string().required(),
-      description: Joi.string().required(),
-      location: Joi.string().required(),
-    }).required()
-   
-  });
+  
   const {error} = campSchema.validate(req.body);
   if(error){
     const msg = error.details.map((el)=> el.message).join(',');
@@ -108,7 +100,7 @@ app.delete("/campgrounds/:id", async (req, res) => {
 });
 
 //update campground
-app.put("/campgrounds/:id", catchAsync(async (req, res) => {
+app.put("/campgrounds/:id", validateCampground, catchAsync(async (req, res) => {
   const id = req.params.id;
 
   if (!ObjectId.isValid(id)) {
@@ -119,12 +111,12 @@ app.put("/campgrounds/:id", catchAsync(async (req, res) => {
       throw new ExpressError('Invalid campground data', 400);
   }
 
-  const campground = await Campground.findByIdAndUpdate(id, req.body, {
+  const camp = await Campground.findByIdAndUpdate(id, req.body.campground, {
       runValidators: true,
       new: true
   });
 
-  if (!campground) {
+  if (!camp) {
       throw new ExpressError('Campground not found', 404);
   }
 
