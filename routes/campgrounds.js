@@ -5,19 +5,8 @@ const Campground = require("../models/campground");
 const catchAsync = require('../utils/catchAsync');
 const ExpressError = require('../utils/ExpressError');
 const { ObjectId } = require('mongoose').Types;
+const {validateCampground} = require('../schemas');
 
-
-const validateCampground = (req,res,next)=>{
-  
-    const {error} = campSchema.validate(req.body);
-    if(error){
-      const msg = error.details.map((el)=> el.message).join(',');
-      throw new ExpressError(msg, 400);
-    }
-    else{
-     next();
-    }
-  };
 
 
 // router.get("/createCampground", async (req, res) => {
@@ -39,7 +28,6 @@ const validateCampground = (req,res,next)=>{
   router.get("/", async (req, res) => {
     try {
       const campgrounds = await Campground.find({});
-     
       res.render("campgrounds/index", { campgrounds});
     } catch (err) {
       console.log("Error while fething campgrounds: ");
@@ -57,7 +45,8 @@ const validateCampground = (req,res,next)=>{
       // if(!req.body.campground) throw new ExpressError('Invalid campground data', 400);
       const camp = new Campground(req.body.campground);
       await camp.save();
-      console.log("new record added!!");
+      // console.log("new record added!!");
+      req.flash('success', 'added a new campground!!');
       res.redirect(`/campgrounds/${camp._id}`);
   }));
   
@@ -67,9 +56,15 @@ const validateCampground = (req,res,next)=>{
         if (!ObjectId.isValid(id)) {
           throw new ExpressError('Invalid campground ID', 400);
         }
-        const camp = await Campground.find({ _id: id });
+        const camp = await Campground.findOne({ _id: id }).populate('reviews');
+        // console.log(camp);
+        if(!camp){
+          req.flash('error', 'No such campground found!!');
+          return res.redirect('/campgrounds');
+        }
         const count = await Review.find({camp: id}).countDocuments();
-        res.render("campgrounds/show", { camp, count });
+        // const reviews = await Review.find({camp: id});
+        res.render("campgrounds/show", { camp, count});
     
     }));
 
@@ -77,6 +72,10 @@ const validateCampground = (req,res,next)=>{
 router.get("/:id/edit", async (req, res) => {
     try {
       const camp = await Campground.find({ _id: req.params.id });
+      if(!camp){
+        req.flash('error', 'No such campground found!!');
+        return res.redirect('/campgrounds');
+      }
       res.render("campgrounds/edit", { camp });
     } catch (err) {
       console.log("Error encountered: ");
@@ -89,13 +88,15 @@ router.get("/:id/edit", async (req, res) => {
     try {
       const id = req.params.id;
       await Campground.findByIdAndDelete(id);
+      req.flash('success', 'campground deleted successfully!!');
       res.redirect("/campgrounds");
     } catch (err) {
       console.log("Error while deleting: ");
       console.log(err);
     }
   });
-  
+
+
   //update campground
   router.put("/:id", validateCampground, catchAsync(async (req, res) => {
     const id = req.params.id;
@@ -112,7 +113,8 @@ router.get("/:id/edit", async (req, res) => {
         runValidators: true,
         new: true
     });
-  
+    
+    req.flash('success', 'campground updated!!');
     if (!camp) {
         throw new ExpressError('Campground not found', 404);
     }
@@ -121,18 +123,8 @@ router.get("/:id/edit", async (req, res) => {
   }));
   
   
-  //reviews
-  router.post('/:id/reviews', catchAsync(async(req,res)=>{
-      const id = req.params.id
-      const body = req.body.review.body;
-      const rating = req.body.review.rating;
-      const campground = await Campground.findById(id);
-      const review = await Review.insertOne({body: body, rating: rating, camp: id})
-      campground.reviews.push(review);
-      await review.save();
-      await campground.save();
-      res.redirect(`/campgrounds/${id}`);
-  }));
+ 
+  
   
 module.exports = router;  
   

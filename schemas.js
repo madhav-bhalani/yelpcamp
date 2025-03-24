@@ -1,6 +1,8 @@
 const Joi = require('joi');
+const ExpressError = require('./utils/ExpressError');
 
-module.exports.campSchema = Joi.object({
+
+const campSchema = Joi.object({
     campground: Joi.object({
       title: Joi.string().required(),
       price: Joi.number().required().min(0),
@@ -10,3 +12,14 @@ module.exports.campSchema = Joi.object({
     }).required()
    
   });
+
+module.exports.validateCampground = (req,res,next)=>{
+    const {error} = campSchema.validate(req.body);
+    if(error){
+      const msg = error.details.map((el)=> el.message).join(',');
+      throw new ExpressError(msg, 400);
+    }
+    else{
+     next();
+    }
+  };

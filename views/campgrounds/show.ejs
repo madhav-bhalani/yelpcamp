@@ -1,26 +1,26 @@
-<%layout('./layouts/boilerplate')%> <%camp.forEach((c)=>{%>
+<%layout('./layouts/boilerplate')%> 
 
 <div class="row">
-  <div class="col-6 offset-3">
+  <div class="col-6">
     <div class="card mb-3">
-      <img src="<%=c.image%>" class="card-img-top" alt="..." />
+      <img src="<%=camp.image%>" class="card-img-top" alt="..." />
       <div class="card-body">
-        <h5 class="card-title"><%=c.title%></h5>
-        <p class="card-text"><%=c.description%></p>
+        <h5 class="card-title"><%=camp.title%></h5>
+        <p class="card-text"><%=camp.description%></p>
       </div>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item">Location: <%=c.location%></li>
-        <li class="list-group-item">Price: $<%=c.price%>/night</li>
+        <li class="list-group-item">Location: <%=camp.location%></li>
+        <li class="list-group-item">Price: $<%=camp.price%>/night</li>
         <li class="list-group-item">Total Reviews:
           <b><%=count%></b></li>
       </ul>
       <div class="card-body">
-        <a href="/campgrounds/<%=c._id%>/edit" class="card-link btn btn-info"
+        <a href="/campgrounds/<%=camp._id%>/edit" class="card-link btn btn-info"
           >Edit Campground</a
         >
         <form
           class="d-inline"
-          action="/campgrounds/<%=c._id%>?_method=DELETE"
+          action="/campgrounds/<%=camp._id%>?_method=DELETE"
           method="post"
         >
           <button class="btn btn-danger" type="submit">
@@ -29,8 +29,10 @@
         </form>
       </div>
     </div>
+  </div>
+  <div class="col-6">
     <h2>Leave a review: </h2>
-    <form class="mb-3 needs-validation" action="/campgrounds/<%=c._id%>/reviews" method="post" novalidate>
+    <form class="mb-3 needs-validation" action="/campgrounds/<%=camp._id%>/reviews" method="post" novalidate>
       <div class="mb-3">
         <label for="rating" class="form-label">Rating</label>
         <input type="range" class="form-range" name="review[rating]" min="0" max="5" id="customRange2"> 
@@ -43,7 +45,16 @@
         <button class="btn btn-success" type="submit">Add Review</button>
       </div>
     </form>
+    <% for(let r of camp.reviews){ %>
+     <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Rating: <%=r.rating%>/5 </h5>
+        <p class="card-text">Review: <%=r.body%></p>
+        <form action="/campgrounds/<%=camp._id%>/reviews/<%=r._id%>?_method=DELETE" method="post"><button class="btn btn-danger" type="submit">Delete review</button></form>
+      </div>
+     </div>
+   <% }%>
   </div>
 </div>
 
-<%})%>
+
