@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const objectId = Schema.Types.ObjectId;
 
 const CampgroundSchema = new Schema({
   title: {
@@ -18,7 +19,13 @@ const CampgroundSchema = new Schema({
   location: {
       type: String,
       required: true
-  }
+  },
+  reviews: [
+    {
+      type: objectId,
+      ref: 'Review'
+    }
+  ]
 });
 
 module.exports = mongoose.model("Campground", CampgroundSchema);
