@@ -12,6 +12,7 @@ const User = require('./models/user');
 const passport = require ('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
+const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
 
@@ -56,18 +57,20 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.get('fakeUser', async(req,res)=>{
+app.get('/fakeUser', async(req,res)=>{
   const user = new User({email: 'cool@gmail.com', username: 'coolguy'});
   const newUser = await User.register(user, 'coolguy');
   res.send(newUser);
 })
 
 app.use((req,res,next)=>{
+  res.locals.currentUser = req.user;
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
   next();
 })
 
+app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);
 app.use('/campgrounds', reviewRoutes);
 

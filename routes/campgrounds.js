@@ -6,8 +6,9 @@ const catchAsync = require('../utils/catchAsync');
 const ExpressError = require('../utils/ExpressError');
 const { ObjectId } = require('mongoose').Types;
 const {validateCampground} = require('../schemas');
-
-
+const {isLoggedIn, storeReturnTo} = require('../middlewares/auth');
+const auth = require ('../middlewares/auth');
+// const auth = require('../middlewares/auth');
 
 // router.get("/createCampground", async (req, res) => {
 //     try {
@@ -36,9 +37,13 @@ const {validateCampground} = require('../schemas');
   });
 
   //render new campground form
-  router.get("/new", (req, res) => {
+  router.get("/new", auth.isLoggedIn, catchAsync(async(req, res, next) => {
+    // if(!req.isAuthenticated()){
+    //   req.flash('error', 'You must be signed in..');
+    //   return res.redirect('/login');
+    // }
     res.render("campgrounds/new");
-  });
+  }));
   
   //adding new campground
   router.post("/", validateCampground, catchAsync(async (req, res, next) => {
@@ -69,7 +74,7 @@ const {validateCampground} = require('../schemas');
     }));
 
 //render campground Edit form
-router.get("/:id/edit", async (req, res) => {
+router.get("/:id/edit", auth.isLoggedIn, catchAsync(async (req, res) => {
     try {
       const camp = await Campground.find({ _id: req.params.id });
       if(!camp){
@@ -81,7 +86,7 @@ router.get("/:id/edit", async (req, res) => {
       console.log("Error encountered: ");
       console.log(err);
     }
-  });
+  }));
   
   //delete campground
   router.delete("/:id", async (req, res) => {
