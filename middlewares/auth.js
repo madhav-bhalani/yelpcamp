@@ -54,4 +54,4 @@ const isReviewAuthor = async(req,res,next)=>{
 
 // module.exports = {isLoggedIn}
 
-module.exports = {isLoggedIn, storeReturnTo, isAuthor, validateCampground, isReviewAuthor}
+module.exports = {isLoggedIn, storeReturnTo, isAuthor, validateCampground, isReviewAuthor} 
