@@ -11,6 +11,10 @@ const reviewSchema = new Schema({
     },
     camp: {
         type: objectId
+    },
+    author: {
+        type: objectId,
+        ref: 'User'
     }
 
 });

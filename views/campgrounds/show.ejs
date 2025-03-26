@@ -11,9 +11,9 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item">Location: <%=camp.location%></li>
         <li class="list-group-item">Price: $<%=camp.price%>/night</li>
-        <li class="list-group-item">Total Reviews:
-          <b><%=count%></b></li>
+          <li class="list-group-item">Author: <b><%=camp.author.username%></b></li>
       </ul>
+      <%if (currentUser && camp.author.equals(currentUser._id)){%>
       <div class="card-body">
         <a href="/campgrounds/<%=camp._id%>/edit" class="card-link btn btn-info"
           >Edit Campground</a
@@ -28,10 +28,13 @@
           </button>
         </form>
       </div>
+      <%}%>
     </div>
   </div>
   <div class="col-6">
-    <h2>Leave a review: </h2>
+    <%if(currentUser){%>
+    <h2>Leave a review: </h2> 
+    
     <form class="mb-3 needs-validation" action="/campgrounds/<%=camp._id%>/reviews" method="post" novalidate>
       <div class="mb-3">
         <label for="rating" class="form-label">Rating</label>
@@ -45,15 +48,23 @@
         <button class="btn btn-success" type="submit">Add Review</button>
       </div>
     </form>
+    <%}%>
+    <h3>Total Reviews: <%=count%></h3>
     <% for(let r of camp.reviews){ %>
      <div class="card mb-3">
       <div class="card-body">
         <h5 class="card-title">Rating: <%=r.rating%>/5 </h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+         by: <%=r.author.username%>
+        </h6>
         <p class="card-text">Review: <%=r.body%></p>
-        <form action="/campgrounds/<%=camp._id%>/reviews/<%=r._id%>?_method=DELETE" method="post"><button class="btn btn-danger" type="submit">Delete review</button></form>
-      </div>
+        <%if (currentUser && r.author.equals(currentUser._id)){%>
+          <form action="/campgrounds/<%=camp._id%>/reviews/<%=r._id%>?_method=DELETE" method="post"><button class="btn btn-danger" type="submit">Delete review</button></form>
+        <%}%>
+        </div>
      </div>
    <% }%>
+
   </div>
 </div>
 

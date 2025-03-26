@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const Review = require('../models/review');
+const User = require('../models/user');
 const Campground = require("../models/campground");
 const catchAsync = require('../utils/catchAsync');
 const ExpressError = require('../utils/ExpressError');
 const { ObjectId } = require('mongoose').Types;
-const {validateCampground} = require('../schemas');
-const {isLoggedIn, storeReturnTo} = require('../middlewares/auth');
-const auth = require ('../middlewares/auth');
+const {validateCampground} = require('../middlewares/auth');
+const {isLoggedIn, isAuthor} = require('../middlewares/auth');
+// const auth = require ('../middlewares/auth');
 // const auth = require('../middlewares/auth');
 
 // router.get("/createCampground", async (req, res) => {
@@ -37,7 +38,7 @@ const auth = require ('../middlewares/auth');
   });
 
   //render new campground form
-  router.get("/new", auth.isLoggedIn, catchAsync(async(req, res, next) => {
+  router.get("/new", isLoggedIn, catchAsync(async(req, res, next) => {
     // if(!req.isAuthenticated()){
     //   req.flash('error', 'You must be signed in..');
     //   return res.redirect('/login');
@@ -49,6 +50,7 @@ const auth = require ('../middlewares/auth');
   router.post("/", validateCampground, catchAsync(async (req, res, next) => {
       // if(!req.body.campground) throw new ExpressError('Invalid campground data', 400);
       const camp = new Campground(req.body.campground);
+      camp.author = req.user._id;
       await camp.save();
       // console.log("new record added!!");
       req.flash('success', 'added a new campground!!');
@@ -61,7 +63,11 @@ const auth = require ('../middlewares/auth');
         if (!ObjectId.isValid(id)) {
           throw new ExpressError('Invalid campground ID', 400);
         }
-        const camp = await Campground.findOne({ _id: id }).populate('reviews');
+        const camp = await Campground.findOne({ _id: id }).populate({path: 'reviews', 
+          populate: {
+            path: 'author'
+          }
+        }).populate('author');
         // console.log(camp);
         if(!camp){
           req.flash('error', 'No such campground found!!');
@@ -74,14 +80,18 @@ const auth = require ('../middlewares/auth');
     }));
 
 //render campground Edit form
-router.get("/:id/edit", auth.isLoggedIn, catchAsync(async (req, res) => {
+router.get("/:id/edit", isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     try {
-      const camp = await Campground.find({ _id: req.params.id });
-      if(!camp){
+      const id = req.params.id;
+      const campground = await Campground.find({ _id: id });
+      if(!campground){
         req.flash('error', 'No such campground found!!');
         return res.redirect('/campgrounds');
       }
+
       res.render("campgrounds/edit", { camp });
+
+      
     } catch (err) {
       console.log("Error encountered: ");
       console.log(err);
@@ -103,28 +113,27 @@ router.get("/:id/edit", auth.isLoggedIn, catchAsync(async (req, res) => {
 
 
   //update campground
-  router.put("/:id", validateCampground, catchAsync(async (req, res) => {
+  router.put("/:id", isLoggedIn, isAuthor,  validateCampground, catchAsync(async (req, res) => {
     const id = req.params.id;
-  
     if (!ObjectId.isValid(id)) {
-        throw new ExpressError('Invalid campground ID', 400);
+      throw new ExpressError('Invalid campground ID', 400);
     }
-  
+
     if (!req.body) {
-        throw new ExpressError('Invalid campground data', 400);
+      throw new ExpressError('Invalid campground data', 400);
     }
-  
-    const camp = await Campground.findByIdAndUpdate(id, req.body.campground, {
+ 
+      const camp = await Campground.findByIdAndUpdate(id, req.body.campground, {
         runValidators: true,
         new: true
-    });
-    
-    req.flash('success', 'campground updated!!');
-    if (!camp) {
+      });
+      req.flash('success', 'campground updated!!');
+      res.redirect(`/campgrounds/${id}`);
+      if (!camp) {
         throw new ExpressError('Campground not found', 404);
-    }
+      }
   
-    res.redirect(`/campgrounds/${id}`);
+    
   }));
   
   
