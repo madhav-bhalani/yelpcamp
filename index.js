@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const app = express();
 const port = 3050;
@@ -11,7 +12,6 @@ const flash = require('connect-flash');
 const User = require('./models/user');
 const passport = require ('passport');
 const LocalStrategy = require('passport-local').Strategy;
-
 const userRoutes = require('./routes/users');
 const campgroundRoutes = require('./routes/campgrounds');
 const reviewRoutes = require('./routes/reviews');
@@ -73,7 +73,6 @@ app.use((req,res,next)=>{
 app.use('/', userRoutes);
 app.use('/campgrounds', campgroundRoutes);
 app.use('/campgrounds', reviewRoutes);
-
 
 
 // app.get("/", (req, res) => {
